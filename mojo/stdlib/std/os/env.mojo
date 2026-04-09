@@ -38,6 +38,14 @@ def setenv(var name: String, var value: String, overwrite: Bool = True) -> Bool:
     Returns:
       False if the name is empty or contains an `=` character. In any other
       case, True is returned.
+
+    Example:
+    ```mojo
+    from std.os import setenv, getenv
+
+    var ok = setenv("MY_VAR", "hello")
+    print(getenv("MY_VAR"))  # hello
+    ```
     """
     var status = external_call["setenv", Int32](
         name.as_c_string_slice().unsafe_ptr(),
@@ -55,6 +63,15 @@ def unsetenv(var name: String) -> Bool:
 
     Returns:
         True if unsetting the variable succeeded. Otherwise, False is returned.
+
+    Example:
+    ```mojo
+    from std.os import setenv, unsetenv, getenv
+
+    _ = setenv("MY_VAR", "hello")
+    _ = unsetenv("MY_VAR")
+    print(getenv("MY_VAR"))  # (empty string)
+    ```
     """
     return (
         external_call["unsetenv", c_int](name.as_c_string_slice().unsafe_ptr())
@@ -76,6 +93,15 @@ def getenv(var name: String, default: String = "") -> String:
 
     Returns:
       The value of the environment variable.
+
+    Example:
+    ```mojo
+    from std.os import getenv
+
+    var home = getenv("HOME")
+    var missing = getenv("NONEXISTENT", "fallback")
+    print(missing)  # fallback
+    ```
     """
     var ptr = external_call[
         "getenv", _CPointer[UInt8, ExternalOrigin[mut=False]]
